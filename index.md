@@ -1,3 +1,4 @@
+# WEEK 1
 ## Tìm hiểu Apache Spark
 Apache Spark là một open source cluster computing framework được phát triển sơ khởi vào năm 2009 bởi AMPLab tại đại học California, Berkeley. Sau này, Spark đã được trao cho Apache Software Foundation vào năm 2013 và được phát triển cho đến nay.
 Khi ta có một tác vụ nào đó qúa lớn mà không thể xử lý trên một laptop hay một server, Spark cho phép ta phân chia tác vụ này thành những phần dễ quản lý hơn. Sau đó, Spark sẽ chạy các tác vụ này trong bộ nhớ, trên các cluster của nhiều server khác nhau để khai thác tốc độ truy xuất nhanh từ RAM. Spark sử dụng API Resilient Distributed Dataset (RDD) để xử lý dữ liệu.
@@ -41,6 +42,85 @@ Hoạt động của MapReduce có thể được tóm tắt như sau:
 - Sắp xếp và trộn các kết quả thu được từ các máy tính phân tán thích hợp nhất.
 - Tổng hợp các kết quả trung gian thu được ( thực hiện hàm reduce)
 - Đưa ra kết quả cuối cùng.
-
+# WEEK 2
+## Spark Properties
+Thuộc tính Spark kiểm soát hầu hết các cài đặt ứng dụng và được cấu hình riêng cho từng ứng dụng. Các thuộc tính này có thể được đặt trực tiếp trên SparkConf được chuyển tới SparkContext của bạn. SparkConf cho phép bạn định cấu hình một số thuộc tính phổ biến (ví dụ: URL chính và tên ứng dụng), cũng như các cặp khóa-giá trị tùy ý thông qua phương thức set ().
+Khi nói đến thuộc tính Spark thì phải đề cập những vấn đề dưới đây
+- Dynamically Loading Spark Properties (Tải động các thuộc tính Spark)
+- Viewing Spark Properties (Xem thuộc tính Spark)
+- Available Properties (Thuộc tính có sẵn)
+- Environment Variables (Các biến môi trường)
+- Configuring Logging (Định cấu hình ghi nhật ký)
+- Overriding configuration directory (Ghi đè thư mục cấu hình)
+- Inheriting Hadoop Cluster Configuration (Kế thừa cấu hình cụm Hadoop)
+- Custom Hadoop/Hive Configuration (Cấu hình Hadoop / Hive tùy chỉnh)
+## Spark RDD (Resilient Distributed Datasets)
+Resilient Distributed Datasets (RDD) là một cấu trúc dữ liệu cơ bản của Spark. Nó là một tập hợp các đối tượng được phân phối bất biến. Mỗi tập dữ liệu trong RDD được chia thành các phân vùng logic, có thể được tính toán trên các nút khác nhau của cụm. RDD có thể chứa bất kỳ loại đối tượng Python, Java hoặc Scala nào, bao gồm các lớp do người dùng định nghĩa.
+Về mặt hình thức, RDD là một tập hợp các bản ghi được phân vùng, chỉ đọc. RDD có thể được tạo thông qua các hoạt động xác định trên dữ liệu trên bộ lưu trữ ổn định hoặc các RDD khác. RDD là một tập hợp các phần tử chịu được lỗi có thể hoạt động song song.
+Có hai cách để tạo RDDs:
+- Tạo từ một tập hợp dữ liệu có sẵn trong ngôn ngữ sử dụng như Java, Python, Scala.
+- Lấy từ dataset hệ thống lưu trữ bên ngoài như HDFS, Hbase hoặc các cơ sở dữ liệu quan hệ.
+Spark sử dụng khái niệm RDD để đạt được các hoạt động MapReduce nhanh hơn và hiệu quả hơn. Trước tiên, chúng ta hãy thảo luận về cách các hoạt động MapReduce diễn ra và tại sao chúng không hiệu quả như vậy.
+### Chia sẻ dữ liệu chậm trong MapReduce
+MapReduce được sử dụng rộng rãi để xử lý và tạo các tập dữ liệu lớn với một thuật toán phân tán, song song trên một cụm. Nó cho phép người dùng viết các phép tính song song, sử dụng một tập hợp các toán tử cấp cao, mà không phải lo lắng về việc phân phối công việc và khả năng chịu lỗi.
+Thật không may, trong hầu hết các khuôn khổ hiện tại, cách duy nhất để sử dụng lại dữ liệu giữa các lần tính toán (Ví dụ: giữa hai công việc MapReduce) là ghi nó vào hệ thống lưu trữ ổn định bên ngoài (Ví dụ - HDFS). Mặc dù khung công tác này cung cấp nhiều thông tin tóm tắt để truy cập tài nguyên tính toán của một cụm, người dùng vẫn muốn nhiều hơn thế.
+Cả hai ứng dụng Lặp lại và Tương tác đều yêu cầu chia sẻ dữ liệu nhanh hơn trên các công việc song song. Chia sẻ dữ liệu chậm trong MapReduce do sao chép, tuần tự hóa và IO đĩa. Về hệ thống lưu trữ, hầu hết các ứng dụng Hadoop, chúng dành hơn 90% thời gian để thực hiện các thao tác đọc-ghi HDFS.
+Hoạt động lặp lại trên MapReduce
+Sử dụng lại các kết quả trung gian qua nhiều phép tính trong các ứng dụng nhiều giai đoạn. Hình minh họa sau giải thích cách hoạt động của khung hiện tại trong khi thực hiện các hoạt động lặp lại trên MapReduce. Điều này phát sinh chi phí đáng kể do sao chép dữ liệu, I / O đĩa và tuần tự hóa, khiến hệ thống chậm.
  
+### Hoạt động tương tác trên MapReduce
+Người dùng chạy các truy vấn đặc biệt trên cùng một tập con dữ liệu. Mỗi truy vấn sẽ thực hiện I / O đĩa trên bộ nhớ ổn định, có thể chi phối thời gian thực thi ứng dụng.
+Hình minh họa sau giải thích cách hoạt động của khung hiện tại khi thực hiện các truy vấn tương tác trên MapReduce.
+ 
+### Chia sẻ dữ liệu bằng Spark RDD
+Chia sẻ dữ liệu chậm trong MapReduce do sao chép, tuần tự hóa và IO đĩa. Hầu hết các ứng dụng Hadoop, chúng dành hơn 90% thời gian để thực hiện các thao tác đọc-ghi HDFS.
+Nhận thức được vấn đề này, các nhà nghiên cứu đã phát triển một framework chuyên biệt có tên là Apache Spark. Ý tưởng chính của tia lửa là Tập dữ liệu phân tán có khả năng phục hồi (RDD); nó hỗ trợ tính toán xử lý trong bộ nhớ. Điều này có nghĩa là, nó lưu trữ trạng thái bộ nhớ như một đối tượng trên các công việc và đối tượng có thể chia sẻ giữa các công việc đó. Chia sẻ dữ liệu trong bộ nhớ nhanh hơn mạng và Đĩa từ 10 đến 100 lần.
+### Thực thi trên Spark RDD
+Để khắc phục được vấn đề về MapRedure, các nhà nghiên cứu đã phát triển một framework chuyên biệt gọi là Apache Spark. Ý tưởng chính của Spark là Resilient Distributed Datasets (RDD); nó hỗ trợ tính toán xử lý trong bộ nhớ. Điều này có nghĩa, nó lưu trữ trạng thái của bộ nhớ dưới dạng một đối tượng trên các công việc và đối tượng có thể chia sẻ giữa các công việc đó. Việc xử lý dữ liệu trong bộ nhớ nhanh hơn 10 đến 100 lần so với network và disk.
+
+- Iterative Operation trên Spark RDD:
+ - Interactive Operations trên Spark RDD:
+ 
+### Các loại RDD
+  
+- Các RDD biểu diễn một tập hợp cố định, đã được phân vùng các record để có thể xử lý song song.
+- Các record trong RDD có thể là đối tượng Java, Scale hay Python tùy lập trình viên chọn. Không giống như DataFrame, mỗi record của DataFrame phải là một dòng có cấu trúc chứa các field đã được định nghĩa sẵn.
+- RDD đã từng là API chính được sử dụng trong series Spark 1.x và vẫn có thể sử dụng trong version 2.X nhưng không còn được dùng thường xuyên nữa.
+- RDD API có thể được sử dụng trong Python, Scala hay Java:
+  - Scala và Java: Perfomance tương đương trên hầu hết mọi phần. (Chi phí lớn nhất là khi xử lý các raw object)
+  - Python: Mất một lượng performance, chủ yếu là cho việc serialization giữa tiến trình Python và JVM
+## DATAFRAME - KHUNG DỮ LIỆU ĐA NĂNG
+### Định nghĩa
+Trong Spark, DataFrame là một tập hợp dữ liệu phân tán được tổ chức thành các cột được đặt tên. Về mặt khái niệm, nó tương đương với một bảng trong cơ sở dữ liệu quan hệ hoặc một khung dữ liệu trong R / Python, nhưng với các tối ưu hóa phong phú hơn. DataFrames có thể được xây dựng từ nhiều nguồn như: tệp dữ liệu có cấu trúc, bảng trong Hive, cơ sở dữ liệu (SQL) hoặc RDD hiện có.
+    Ví dụ minh họa với Spark SQL:
+	  
+Tạo một DataFrame về nhân viên có Tên của nhân viên dưới dạng kiểu dữ liệu chuỗi, ID nhân viên là kiểu dữ liệu chuỗi, Số điện thoại của nhân viên dưới dạng kiểu dữ liệu số nguyên, Địa chỉ nhân viên dưới dạng chuỗi kiểu dữ liệu, Mức lương của nhân viên dưới dạng kiểu dữ liệu nổi. Dữ liệu của từng nhân viên được lưu theo từng hàng như hình trên.
+### DataFrames được thiết kế để đa chức năng
+#### Nhiều ngôn ngữ lập trình
+Đặc tính tốt nhất của DataFrames trong Spark là hỗ trợ nhiều ngôn ngữ, giúp các lập trình viên từ các nền tảng lập trình khác nhau sử dụng dễ dàng hơn. DataFrames trong Spark hỗ trợ R - Ngôn ngữ lập trình, Python, Scala và Java.
+#### Nhiều nguồn dữ liệu
+DataFrames trong Spark có thể hỗ trợ nhiều nguồn dữ liệu khác nhau.
+  
+#### Xử lý dữ liệu có cấu trúc và bán cấu trúc
+Yêu cầu cốt lõi mà DataFrames được giới thiệu là xử lý Dữ liệu lớn một cách dễ dàng. DataFrames trong Spark sử dụng định dạng bảng để lưu trữ dữ liệu theo cách linh hoạt cùng với lược đồ cho dữ liệu mà nó đang xử lý.
+#### Slicing và Dicing dữ liệu
+API DataFrame hỗ trợ Slicing và Dicing dữ liệu. Nó có thể thực hiện các thao tác như chọn và lọc theo hàng và cột. Dữ liệu thống kê luôn có xu hướng bị Thiếu giá trị, Vi phạm phạm vi và giá trị không liên quan. Người dùng có thể quản lý dữ liệu bị thiếu một cách rõ ràng bằng cách sử dụng DataFrames.
+### Các tính năng của DataFrame trong Spark
+	  
+DataFrame trong spark có bản chất là Bất biến. Giống như Tập dữ liệu được phân phối có khả năng phục hồi, dữ liệu có trong DataFrame không thể bị thay đổi.
+Việc lười đánh giá là chìa khóa cho hiệu suất đáng chú ý do Spark mang lại. DataFrames trong Spark sẽ không hiển thị đầu ra trên màn hình trừ khi một thao tác hành động được kích hoạt.
+Kỹ thuật Bộ nhớ phân tán được sử dụng để xử lý dữ liệu làm cho chúng có khả năng chịu lỗi.
+Giống như Tập dữ liệu phân tán có khả năng phục hồi, DataFrames trong Spark mở rộng thuộc tính của mô hình bộ nhớ phân tán. Cách duy nhất để thay đổi hoặc sửa đổi dữ liệu trong DataFrame sẽ là áp dụng Chuyển đổi.
+### Nguồn cho Spark Data Frame
+  
+Có rất nhiều cách để tạo DataFrame trong Spark như:
+Dữ liệu có thể được tải vào thông qua CSV, JSON, XML, SQL, RDBMS và nhiều hơn nữa. Nó cũng có thể được tạo bằng cách sử dụng RDD hiện có và thông qua bất kỳ cơ sở dữ liệu nào khác, như Hive, HBase, Cassandra. Nó cũng có thể lấy dữ liệu từ HDFS hoặc hệ thống tệp cục bộ.
+ 
+https://spark.apache.org/docs/latest/configuration.html
+https://www.tutorialspoint.com/apache_spark/apache_spark_rdd.htm
+https://laptrinh.vn/books/apache-spark/page/apache-spark-rdd
+https://www.edureka.co/blog/dataframes-in-spark
+
+
+
 
