@@ -166,4 +166,34 @@ Code https://colab.research.google.com/drive/19oLi-1z14q2PVnxxRjIxNyCOIuLC9MOo?u
 
 # Machine Learning
 
+Cài đặt Spark 
 
+![1](https://user-images.githubusercontent.com/58651463/116821393-f1391100-aba3-11eb-8bcd-e9ec54493813.png)
+
+Đọc dữ liệu và kiểu thuộc tính
+
+![2](https://user-images.githubusercontent.com/58651463/116821394-f1391100-aba3-11eb-94da-03062747f37d.png)
+
+Show dữ liệu
+
+![3](https://user-images.githubusercontent.com/58651463/116821395-f1d1a780-aba3-11eb-86a4-60e32d3af364.png)
+
+![4](https://user-images.githubusercontent.com/58651463/116821396-f26a3e00-aba3-11eb-8782-5ffe94d7f7d9.png)
+
+Gộp tổng kết quả Yes/No trong deposit
+
+![5](https://user-images.githubusercontent.com/58651463/116821397-f302d480-aba3-11eb-86b6-6d6cdd455500.png)
+
+Chuyển dữ liệu thành dạng numberic
+
+![6](https://user-images.githubusercontent.com/58651463/116821399-f39b6b00-aba3-11eb-9fe1-cb610f437a55.png)
+
+Tạo features 
+
+![9](https://user-images.githubusercontent.com/58651463/116821389-f007e400-aba3-11eb-8e3c-b9e8a72f7eff.png)
+
+Chia dữ liệu thành 2 phần (80% sẽ dùng để train, 20% sẽ dùng để test)
+
+![10](https://user-images.githubusercontent.com/58651463/116821392-f0a07a80-aba3-11eb-8d21-8174871918f6.png)
+
+Code https://colab.research.google.com/drive/1_GlQgl2V76cd_DS_auWpICL7ltAmS5mt?usp=sharing
