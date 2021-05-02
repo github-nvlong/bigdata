@@ -155,9 +155,14 @@ Chọn thuộc tính để xem
 ![select](https://user-images.githubusercontent.com/58651463/116820766-d913c280-aba0-11eb-8dd6-c40258c13c6d.png)
 
 https://spark.apache.org/docs/latest/configuration.html
+
 https://www.tutorialspoint.com/apache_spark/apache_spark_rdd.htm
+
 https://laptrinh.vn/books/apache-spark/page/apache-spark-rdd
+
 https://www.edureka.co/blog/dataframes-in-spark
+
+Code https://colab.research.google.com/drive/19oLi-1z14q2PVnxxRjIxNyCOIuLC9MOo?usp=sharing
 
 
 
