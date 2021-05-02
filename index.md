@@ -155,7 +155,6 @@ Chọn thuộc tính để xem
 ![select](https://user-images.githubusercontent.com/58651463/116820766-d913c280-aba0-11eb-8dd6-c40258c13c6d.png)
 
 https://spark.apache.org/docs/latest/configuration.html
-
 https://www.tutorialspoint.com/apache_spark/apache_spark_rdd.htm
 
 https://laptrinh.vn/books/apache-spark/page/apache-spark-rdd
